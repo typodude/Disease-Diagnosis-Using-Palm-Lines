@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Predict Disease - Palm Line Analysis</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="PalmAI Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li class="dropdown">
+                <a href="#">Diseases 
+                    <span class="dropdown-icon">&#9662;</span>
+                </a>
+                <div class="dropdown-content">
+                    <a href="#">Hypertension & Cardiovascular Disease</a>
+                    <a href="#">Down Syndrome - Heart Defects & Immune Issues</a>
+                    <a href="#">Neurological Disorders - Autism & Schizophrenia</a>
+                    <a href="#">Healthy Lifestyle Insights</a>
+                </div>
+            </li>
+            
+            <li><a href="#contact">Contact</a></li>
+            <li class="cta-button"><a href="#" class="blue-button">Try PalmAI</a></li>
+        </ul>
+    </nav>
+
+    <!-- Prediction Section -->
+    <div class="container">
+        <h1>Upload Your Palm Image</h1>
+        <form action="/predict" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required>
+            <button type="submit" class="green-button">Predict</button>
+        </form>
+
+        {% if prediction %}
+        <div class="result">
+            <h3>Prediction Result:</h3>
+            <p>{{ prediction }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Contact Section -->
+    <div id="contact" class="contact-container">
+        <h2>Contact Us</h2>
+        <p>Have questions or feedback? Reach out to us!</p>
+
+        <form action="/contact" method="post">
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Your Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+
+            <button type="submit">Send Message</button>
+        </form>
+
+        <div class="developer-info">
+            <h3>Developer Info</h3>
+            <p><b>Name:</b> Athira</p>
+            <p><b>Email:</b> athira.dev@gmail.com</p>
+            <p><b>LinkedIn:</b> <a href="https://www.linkedin.com/in/athira" target="_blank">Connect with me</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Smooth Scrolling for Navbar Links
+        $('nav a').on('click', function(event) {
+            if (this.hash !== "") {
+                event.preventDefault();
+                $('html, body').animate({
+                    scrollTop: $(this.hash).offset().top
+                }, 800);
+            }
+        });
+    </script>
+</body>
+</html>

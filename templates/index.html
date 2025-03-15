@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Palm Line Disease Prediction</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="PalmAI Logo" />
+            <h3>Early Cure-AI based Disease Detection using Palm</h3>
+        </div>
+
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+
+            <li class="dropdown">
+                <a href="#">Diseases
+                    <span class="dropdown-icon">&#9662;</span>
+                </a>
+                
+            </li>
+
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+
+        <div class="cta-button">
+            <a href="/predict" class="blue-button">Try PalmAI</a>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <!-- Hero Section -->
+<div id="home" class="hero">
+    <div class="hero-content">
+        <h1>Unlock the Secrets of Your Health with AI-powered Insights</h1>
+        <p>Empowering early diagnosis and better well-being.</p>
+    </div>
+</div>
+
+<!-- About Section -->
+<div class="about-section">
+    <div class="about-image">
+        <img src="/static/images/about.png" alt="Palm Analysis">
+    </div>
+    <div class="about-text">
+        <h2>About</h2>
+        <p>
+            The system analyzes palm images to identify potential health risks. By examining palm lines and patterns, 
+            it predicts conditions such as Hypertension, Cardiovascular Diseases, Down Syndrome, Neurological Disorders, and more.
+        </p>
+        <p>
+            Leveraging deep learning models, the system provides accurate predictions and actionable insights, 
+            enabling users to take preventive steps for improved health. The user interface is designed to ensure smooth navigation 
+            and an effective health assessment experience.
+        </p>
+    </div>
+</div>
+
+
+    <div class="disease-slider">
+        <!-- Hypertension -->
+        <div class="slide">
+            <h2>Hypertension & Cardiovascular Disease</h2>
+            <img src="/static/images/heart.png" alt="Hypertension Image">
+            <p>Hypertension is a condition where blood pressure is consistently too high. It is a major risk factor for cardiovascular diseases.</p>
+            <button class="info-button" onclick="showInfo('hypertension-info')">More Info</button>
+            <div id="hypertension-info" class="hidden-info">
+                <h3>Causes & Risk Factors:</h3>
+                <ul>
+                    <li>Obesity</li>
+                    <li>High salt intake</li>
+                    <li>Stress and anxiety</li>
+                    <li>Genetic predisposition</li>
+                </ul>
+            </div>
+        </div>
+    
+        <!-- Down Syndrome -->
+        <div class="slide">
+            <h2>Down Syndrome - Heart Defects & Immune Issues</h2>
+            <img src="/static/images/immune.png" alt="Down Syndrome Image">
+            <p>Down Syndrome is a genetic condition that affects cognitive ability and growth, often accompanied by heart defects and immune issues.</p>
+            <button class="info-button" onclick="showInfo('down-syndrome-info')">More Info</button>
+            <div id="down-syndrome-info" class="hidden-info">
+                <h3>Causes & Risk Factors:</h3>
+                <ul>
+                    <li>Genetic condition (extra copy of chromosome 21)</li>
+                    <li>Maternal age over 35</li>
+                    <li>Family history of Down Syndrome</li>
+                </ul>
+            </div>
+        </div>
+    
+        <!-- Neurological Disorders -->
+        <div class="slide">
+            <h2>Neurological Disorders - Autism & Schizophrenia</h2>
+            <img src="/static/images/brain.png" alt="Neurological Disorders Image">
+            <p>Neurological disorders such as Autism and Schizophrenia affect brain function, behavior, and cognitive abilities.</p>
+            <button class="info-button" onclick="showInfo('neurological-info')">More Info</button>
+            <div id="neurological-info" class="hidden-info">
+                <h3>Causes & Risk Factors:</h3>
+                <ul>
+                    <li>Genetic mutations</li>
+                    <li>Brain injuries or trauma</li>
+                    <li>Environmental toxins during pregnancy</li>
+                </ul>
+            </div>
+        </div>
+    
+        <!-- Scleroderma -->
+        <div class="slide">
+            <h2>Scleroderma - Tissue Disorder</h2>
+            <img src="/static/images/tissue.png" alt="Scleroderma Image">
+            <p>Scleroderma is a chronic autoimmune disease that results in hardening of the skin and connective tissues.</p>
+            <button class="info-button" onclick="showInfo('scleroderma-info')">More Info</button>
+            <div id="scleroderma-info" class="hidden-info">
+                <h3>Causes & Risk Factors:</h3>
+                <ul>
+                    <li>Genetic predisposition</li>
+                    <li>Immune system dysfunction</li>
+                    <li>Environmental factors</li>
+                </ul>
+            </div>
+        </div>
+    
+        <!-- Healthy Lifestyle -->
+        <div class="slide">
+            <h2>Healthy Lifestyle Insights</h2>
+            <img src="/static/images/healthy.png" alt="Healthy Lifestyle Image">
+            <p>Maintaining a healthy lifestyle includes regular exercise, balanced nutrition, and mental well-being for overall vitality.</p>
+            <button class="info-button" onclick="showInfo('healthy-info')">More Info</button>
+            <div id="healthy-info" class="hidden-info">
+                <h3>Causes & Risk Factors for Poor Health:</h3>
+                <ul>
+                    <li>Sedentary lifestyle</li>
+                    <li>Poor eating habits</li>
+                    <li>Inadequate sleep</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+
+
+    <!-- Contact Section -->
+    <div id="contact" class="contact-container">
+        <h2>Contact Us</h2>
+        <p>Have questions or feedback? Reach out to us!</p>
+
+        <form action="/contact" method="post">
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Your Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+
+            <button type="submit">Send Message</button>
+        </form>
+
+        <div class="developer-info">
+            <h3>Developer Info</h3>
+            <p><b>Name:</b> Athira</p>
+            <p><b>Email:</b> athira.dev@gmail.com</p>
+            <p><b>LinkedIn:</b> <a href="https://www.linkedin.com/in/athira" target="_blank">Connect with me</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Smooth Scrolling for Navbar Links
+        $('nav a').on('click', function(event) {
+            if (this.hash !== "") {
+                event.preventDefault();
+                $('html, body').animate({
+                    scrollTop: $(this.hash).offset().top
+                }, 800);
+            }
+        });
+
+        // Feature Slider Animation
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        
+        function showSlide() {
+            slides.forEach(slide => slide.style.display = 'none');
+            slides[currentSlide].style.display = 'block';
+            currentSlide = (currentSlide + 1) % slides.length;
+        }
+
+        setInterval(showSlide, 3000);  // Auto-slide every 3 seconds
+        showSlide();  // Initialize first slide
+    </script>
+</body>
+</html>
