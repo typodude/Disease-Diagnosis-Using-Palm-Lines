@@ -1,17 +1,14 @@
 from flask import Flask, render_template, request
 import cv2
 import numpy as np
-import pandas as pd
-from tensorflow.keras.models import load_model
 import os
+from tensorflow.keras.models import load_model
+import base64
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
-# Load CSV and Clean Labels
-df = pd.read_csv("C:/all pros/palm pro/palm disease app/dataset.csv")
-df['label'] = df['label'].astype(str).str.strip()  # Clean class labels
-
-# Fixed class order to match model's output
+# Fixed class order to match model output
 class_names = [
     "Hypertension, Cardiovascular Disease", 
     "Down Syndrome - Heart Defects and Immune Issues", 
@@ -20,53 +17,94 @@ class_names = [
     "Healthy"
 ]
 
-# Load the trained model
-model = load_model("C:/all pros/palm pro/palm disease app/model/disease_diag_model_v2.h5")
+# Load trained model
+model = load_model("C:/all pros/palm pro/palm disease app/model/palm_disease_model.h5")
+input_shape = model.input_shape[1:]
 
-# Ensure 'static/images' folder exists
+# Upload directory for storing images
 UPLOAD_FOLDER = os.path.join('static', 'images')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Prediction Function
+def preprocess_image(img_path):
+    """Preprocess image dynamically to match model input."""
+    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)  # Convert to grayscale
+    img = cv2.resize(img, (input_shape[0], input_shape[1]))  # Resize dynamically
+    img = np.expand_dims(img, axis=-1)  # Add channel dimension
+    img = np.expand_dims(img, axis=0)   # Add batch dimension
+    img = img.astype("float32") / 255.0  # Normalize pixel values
+    return img
+
 def predict_image(img_path):
-    try:
-        img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-        if img is None:
-            return "Error: Unable to read the image."
-        
-        img = cv2.resize(img, (128, 128)) / 255.0
-        img = img.reshape(1, 128, 128, 1)
+    """Predict disease based on palm image."""
+    img = preprocess_image(img_path)
+    prediction = model.predict(img)[0]  # Get model prediction
+    predicted_class = np.argmax(prediction)  # Get class with highest probability
+    confidence = prediction[predicted_class] * 100  # Confidence in percentage
+    return class_names[predicted_class], confidence
 
-        prediction = model.predict(img)
-        predicted_label_index = np.argmax(prediction)
-        confidence = np.max(prediction) * 100
+def generate_processed_image(img_path):
+    """Generates palm-line image with black background and white palm lines."""
+    img = cv2.imread(img_path)
+    if img is None:
+        return None  # Return None if image cannot be read
 
-        predicted_class = class_names[predicted_label_index]
+    # Convert to grayscale
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        return f"{predicted_class} ({confidence:.2f}% confidence)"
-    
-    except Exception as e:
-        return f"Prediction Error: {str(e)}"
+    # Perform Canny edge detection
+    edges = cv2.Canny(gray_img, 50, 150)
 
-# Routes
-@app.route("/")
-def home():
+    # Create a black background
+    black_background = np.zeros_like(img)
+
+    # Highlight the edges (white) on the black background
+    black_background[edges == 255] = (255, 255, 255)  # White color for edges
+
+    return black_background  # Return the image with highlighted palm lines
+
+@app.route("/", methods=["GET"])
+def index():
+    """Render main page."""
     return render_template("index.html")
 
+# Modify the predict function to ensure the confidence is formatted to two decimal places
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
     prediction = None
-    if request.method == "POST":
-        image = request.files['image']
-        if image:
-            img_path = os.path.join(UPLOAD_FOLDER, image.filename)
-            image.save(img_path)
-            prediction = predict_image(img_path)
-    return render_template("predict.html", prediction=prediction)
+    confidence = None
+    image_path = None
+    highlighted_base64 = None
 
-@app.route("/contact")
-def contact():
-    return render_template("contact.html")
+    if "image" in request.files:
+        image = request.files["image"]
+        if image:
+            filename = secure_filename(image.filename)
+            img_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image.save(img_path)
+
+            # Generate highlighted image with black background and white palm lines
+            highlighted = generate_processed_image(img_path)
+            if highlighted is not None:
+                _, highlighted_encoded = cv2.imencode('.png', highlighted)
+                highlighted_base64 = base64.b64encode(highlighted_encoded).decode('utf-8')
+
+            # Get prediction & confidence
+            prediction, confidence = predict_image(img_path)
+
+            # Format confidence to two decimal places
+            confidence = "{:.2f}".format(confidence)
+
+            # Convert image path to a relative URL
+            image_path = f"/static/images/{filename}"
+
+    return render_template(
+        "predict.html",
+        prediction=prediction,
+        confidence=confidence,
+        image_path=image_path,
+        highlighted_base64=highlighted_base64
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
